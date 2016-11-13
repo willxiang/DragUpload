@@ -9,62 +9,58 @@ using System.Windows.Forms;
 using RestSharp;
 using System.IO;
 using Newtonsoft.Json;
+using DragUpload.Model;
 
 namespace DragUpload
 {
     public partial class Form1 : Form
     {
+
+        ImgurConfig imgurConfig = null;
+
         public Form1()
         {
             InitializeComponent();
             radioBtn_SMMS.Checked = true;
+            imgurConfig = new ImgurConfig();
         }
 
 
-        void radioButtonSeleted(string seletedName)
-        {
-            if (seletedName == "smms")
-            {
-                radioBtn_SMMS.Checked = true;
-                radioBtn_Imgur.Checked = false;
-            }
-            else
-            {
-                radioBtn_SMMS.Checked = false;
-                radioBtn_Imgur.Checked = true;
-            }
-        }
+
+
+
+        Picture activePicture = null;
+        Picture backupPicture = new Picture();
+
+
+
 
         void imgurDelete(string hash)
         {
             var client = new RestClient("https://api.imgur.com/3/image/" + hash);
-
             var request = new RestRequest(Method.POST);
-            request.AddHeader("Authorization", "Client-ID 5fc5e13abb00925");
-
+            request.AddHeader("Authorization", imgurConfig.Authorization);
             var response = client.Execute(request);
-
         }
 
 
-        void imgurUpload(string filePath)
+        void imgurUpload()
         {
             var client = new RestClient("https://api.imgur.com/3/upload");
-
             var request = new RestRequest(Method.POST);
-
-            request.AddHeader("Authorization", "Client-ID 5fc5e13abb00925");
-            request.AddFile("image", filePath);
+            request.AddHeader("Authorization", imgurConfig.Authorization);
+            request.AddFile("image", activePicture.Path);
             var response = client.Execute(request);
             var smms = JsonConvert.DeserializeObject<imgur>(response.Content);
 
             txtDel.Text = smms.data.deletehash;
             txtUrl.Text = smms.data.link;
             txtMD.Text = String.Format("![{0}]({1})", smms.data.id, smms.data.link);
+
         }
 
 
-        void smmsupload(string filePath)
+        void smmsupload()
         {
             try
             {
@@ -72,7 +68,7 @@ namespace DragUpload
 
                 var request = new RestRequest(Method.POST);
 
-                request.AddFile("smfile", filePath);
+                request.AddFile("smfile", activePicture.Path);
 
                 var response = client.Execute(request);
 
@@ -109,13 +105,47 @@ namespace DragUpload
 
             if (s.Length > 0)
             {
+                ReadPicture(s[0].ToString());
                 if (radioBtn_SMMS.Checked)
-                    smmsupload(s[0].ToString());
+                    smmsupload();
                 else
-                    imgurUpload(s[0].ToString());
+                    imgurUpload();
             }
 
         }
+
+
+        void ReadPicture(string path)
+        {
+            FileInfo fileInfo = new FileInfo(path);
+            FileStream stream = fileInfo.OpenRead();
+
+            byte[] bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, bytes.Length);
+
+            if (activePicture == null)
+                activePicture = new Picture();
+
+            activePicture.Name = fileInfo.Name;
+            activePicture.Bytes = bytes;
+            activePicture.Path = path;
+        }
+
+
+
+        class Picture
+        {
+            public string Name { get; set; }
+
+            public string Path { get; set; }
+
+            public byte[] Bytes { get; set; }
+
+            public SmmsData smms { get; set; }
+            public imgur imgur { get; set; }
+
+        }
+
 
 
         class imgur
