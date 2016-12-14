@@ -23,6 +23,13 @@ namespace DragUpload
             InitializeComponent();
             radioBtn_SMMS.Checked = true;
             imgurConfig = new ImgurConfig();
+
+
+            SQLiteHelper.ConnectionString = "Data Source=img.db;Pooling=true;FailIfMissing=false";
+
+            SQLiteHelper.CreateTable();
+            //SQLiteHelper.Test();
+
         }
 
 
@@ -31,7 +38,6 @@ namespace DragUpload
 
         Picture activePicture = null;
         Picture backupPicture = new Picture();
-
 
 
 
@@ -51,16 +57,29 @@ namespace DragUpload
             request.AddHeader("Authorization", imgurConfig.Authorization);
             request.AddFile("image", activePicture.Path);
             var response = client.Execute(request);
-            var smms = JsonConvert.DeserializeObject<imgur>(response.Content);
+            var smms = JsonConvert.DeserializeObject<Imgur>(response.Content);
+
+            if (smms == null)
+            {
+                MessageBox.Show("服务器连接失败");
+                return;
+            }
+
 
             txtDel.Text = smms.data.deletehash;
             txtUrl.Text = smms.data.link;
             txtMD.Text = String.Format("![{0}]({1})", smms.data.id, smms.data.link);
 
+
+            ImgRecord record = new ImgRecord();
+            record.name = smms.data.id;
+            record.url = smms.data.link;
+            record.deleteUrl = smms.data.deletehash;
+            SQLiteHelper.Add(record);
         }
 
 
-        void smmsupload()
+        private void smmsupload()
         {
             try
             {
@@ -72,18 +91,26 @@ namespace DragUpload
 
                 var response = client.Execute(request);
 
-                var smms = JsonConvert.DeserializeObject<SmmsResponse>(response.Content);
+                var smms = JsonConvert.DeserializeObject<SMMS>(response.Content);
 
                 txtDel.Text = smms.data.delete;
                 txtUrl.Text = smms.data.url;
                 txtMD.Text = String.Format("![{0}]({1})", smms.data.filename, smms.data.url);
+
+
+                ImgRecord record = new ImgRecord();
+                record.name = smms.data.filename;
+                record.url = smms.data.url;
+                record.deleteUrl = smms.data.delete;
+
+
+                SQLiteHelper.Add(record);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
-
-
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -115,7 +142,12 @@ namespace DragUpload
         }
 
 
-        void ReadPicture(string path)
+
+
+
+
+
+        private void ReadPicture(string path)
         {
             FileInfo fileInfo = new FileInfo(path);
             FileStream stream = fileInfo.OpenRead();
@@ -133,69 +165,6 @@ namespace DragUpload
 
 
 
-        class Picture
-        {
-            public string Name { get; set; }
-
-            public string Path { get; set; }
-
-            public byte[] Bytes { get; set; }
-
-            public SmmsData smms { get; set; }
-            public imgur imgur { get; set; }
-
-        }
-
-
-
-        class imgur
-        {
-
-            public imgurdata data { get; set; }
-            public bool success { get; set; }
-            public int status { get; set; }
-        }
-
-        class imgurdata
-        {
-            public string id { get; set; }
-            public long datetime { get; set; }
-            public string link { get; set; }
-
-            public string deletehash { get; set; }
-        }
-
-
-        class SmmsResponse
-        {
-            public string code { get; set; }
-
-            public SmmsData data { get; set; }
-
-        }
-
-        class SmmsData
-        {
-            public int width { get; set; }
-            public int height { get; set; }
-            public string filename { get; set; }
-
-            public string storename { get; set; }
-
-            public int size { get; set; }
-
-            public string path { get; set; }
-
-            public string hash { get; set; }
-
-            public long timestamp { get; set; }
-
-            public string ip { get; set; }
-
-            public string url { get; set; }
-
-            public string delete { get; set; }
-        }
 
         private void txtUrl_Click(object sender, EventArgs e)
         {
@@ -216,6 +185,89 @@ namespace DragUpload
         {
             imgurDelete(this.txtDel.Text);
         }
+
+        private void btnExpand_Click(object sender, EventArgs e)
+        {
+            if (this.btnExpand.Text == ">")
+            {
+                this.btnExpand.Text = "<";
+                this.Size = new Size(1000, 299);
+                this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - this.Width) / 2,
+                          (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2);
+                getData();
+            }
+            else
+            {
+                this.btnExpand.Text = ">";
+                this.Size = new Size(391, 299);
+                this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - this.Width) / 2,
+                          (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2);
+            }
+        }
+
+
+        private void getData()
+        {
+            this.dataGridViewImg.DataSource = SQLiteHelper.GetData();
+            this.dataGridViewImg.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+
+
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("是否确定删除？", "再次确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                foreach (DataGridViewRow row in this.dataGridViewImg.SelectedRows)
+                {
+                    if (!row.IsNewRow)
+                    {
+                        DataGridViewCellCollection cells = row.Cells;
+                        var id = Convert.ToInt32(cells["id"].Value);
+                        SQLiteHelper.Remove(id);
+                        this.dataGridViewImg.Rows.Remove(row);
+                    }
+                }
+            }
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in this.dataGridViewImg.SelectedRows)
+            {
+                if (!row.IsNewRow)
+                {
+                    DataGridViewCellCollection cells = row.Cells;
+                    var url = cells["url"].Value.ToString();
+                    System.Windows.Forms.Clipboard.SetText(url);
+                }
+            }
+        }
+
+        private void dataGridViewImg_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex != -1 && e.Button == MouseButtons.Right && !this.dataGridViewImg.Rows[e.RowIndex].IsNewRow)
+            {
+                freshDataGridViewRowsSelectedState();
+                this.dataGridViewImg.Rows[e.RowIndex].Selected = true;
+                contextMenuStrip1.Show(Cursor.Position);
+            }
+        }
+
+
+
+        private void freshDataGridViewRowsSelectedState()
+        {
+            foreach (DataGridViewRow row in this.dataGridViewImg.Rows)
+            {
+                row.Selected = false;
+            }
+        }
+
+
+
 
 
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtUrl = new System.Windows.Forms.TextBox();
             this.lblUrl = new System.Windows.Forms.Label();
@@ -36,10 +37,17 @@
             this.txtDel = new System.Windows.Forms.TextBox();
             this.lbldel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnExpand = new System.Windows.Forms.Button();
+            this.dataGridViewImg = new System.Windows.Forms.DataGridView();
             this.radioBtn_Imgur = new System.Windows.Forms.RadioButton();
             this.radioBtn_SMMS = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewImg)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtUrl
@@ -99,6 +107,8 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnExpand);
+            this.panel1.Controls.Add(this.dataGridViewImg);
             this.panel1.Controls.Add(this.radioBtn_Imgur);
             this.panel1.Controls.Add(this.radioBtn_SMMS);
             this.panel1.Controls.Add(this.label1);
@@ -111,8 +121,30 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(393, 260);
+            this.panel1.Size = new System.Drawing.Size(379, 260);
             this.panel1.TabIndex = 2;
+            // 
+            // btnExpand
+            // 
+            this.btnExpand.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnExpand.Location = new System.Drawing.Point(356, 90);
+            this.btnExpand.Name = "btnExpand";
+            this.btnExpand.Size = new System.Drawing.Size(23, 128);
+            this.btnExpand.TabIndex = 4;
+            this.btnExpand.Text = ">";
+            this.btnExpand.UseVisualStyleBackColor = true;
+            this.btnExpand.Click += new System.EventHandler(this.btnExpand_Click);
+            // 
+            // dataGridViewImg
+            // 
+            this.dataGridViewImg.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewImg.Location = new System.Drawing.Point(385, 14);
+            this.dataGridViewImg.Name = "dataGridViewImg";
+            this.dataGridViewImg.RowTemplate.Height = 23;
+            this.dataGridViewImg.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewImg.Size = new System.Drawing.Size(587, 221);
+            this.dataGridViewImg.TabIndex = 3;
+            this.dataGridViewImg.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewImg_CellMouseUp);
             // 
             // radioBtn_Imgur
             // 
@@ -145,13 +177,36 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "服务器：";
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.deleteToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 70);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(393, 260);
+            this.ClientSize = new System.Drawing.Size(379, 260);
             this.Controls.Add(this.panel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -160,6 +215,8 @@
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewImg)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -176,6 +233,11 @@
         private System.Windows.Forms.RadioButton radioBtn_Imgur;
         private System.Windows.Forms.RadioButton radioBtn_SMMS;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnExpand;
+        private System.Windows.Forms.DataGridView dataGridViewImg;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
     }
 }
 
