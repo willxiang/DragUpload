@@ -10,6 +10,7 @@ using RestSharp;
 using System.IO;
 using Newtonsoft.Json;
 using DragUpload.Model;
+using System.Configuration;
 
 namespace DragUpload
 {
@@ -24,22 +25,13 @@ namespace DragUpload
             radioBtn_SMMS.Checked = true;
             imgurConfig = new ImgurConfig();
 
-
-            SQLiteHelper.ConnectionString = "Data Source=img.db;Pooling=true;FailIfMissing=false";
-
+            SQLiteHelper.ConnectionString = ConfigurationManager.AppSettings["sqlite"];
             SQLiteHelper.CreateTable();
-            //SQLiteHelper.Test();
-
         }
-
-
-
 
 
         Picture activePicture = null;
         Picture backupPicture = new Picture();
-
-
 
         void imgurDelete(string hash)
         {
