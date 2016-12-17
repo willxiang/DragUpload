@@ -14,5 +14,17 @@ namespace DragUpload.Model
         public string url { get; set; }
 
         public string deleteUrl { get; set; }
+
+
+        public ImgType type { get; set; }
     }
+
+
+    public enum ImgType
+    {
+        SMMS = 1,
+
+        IMGUR = 2
+    }
+
 }

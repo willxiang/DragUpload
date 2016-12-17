@@ -36,12 +36,13 @@ namespace DragUpload.Model
         public static void CreateTable()
         {
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS Img 
-(
-id integer PRIMARY KEY AUTOINCREMENT,
-name varchar(100),
-url varchar(255),
-deletion varchar(255)
-)");
+                            (
+                            id integer PRIMARY KEY AUTOINCREMENT,
+                            name varchar(100),
+                            url varchar(255),
+                            deletion varchar(255),
+                            type integer
+                            )");
         }
 
 
@@ -62,14 +63,16 @@ deletion varchar(255)
             SQLiteParameter[] parameter = new SQLiteParameter[] {
                 new SQLiteParameter("@name",DbType.String),
                 new SQLiteParameter("@url",DbType.String),
-                new SQLiteParameter("@deletion",DbType.String)
+                new SQLiteParameter("@deletion",DbType.String),
+                new SQLiteParameter("@type",DbType.Int32)
             };
 
             parameter[0].Value = data.name;
             parameter[1].Value = data.url;
             parameter[2].Value = data.deleteUrl;
+            parameter[3].Value = data.type;
 
-            string sql = "INSERT INTO Img VALUES (NULL,@name,@url,@deletion);";
+            string sql = "INSERT INTO Img VALUES (NULL,@name,@url,@deletion,@type);";
 
             ExecuteNonQuery(sql, parameter);
 
@@ -144,45 +147,6 @@ deletion varchar(255)
         }
 
 
-        public static void test()
-        {
-
-
-            using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
-            {
-                using (SQLiteCommand cmd = new SQLiteCommand())
-                {
-                    if (conn.State != ConnectionState.Open)
-                        conn.Open();
-
-                    cmd.Connection = conn;
-                    //                    cmd.CommandText = @"
-                    //
-                    //INSERT INTO Book(ID, BookName) VALUES(1, '飞狐外传')
-                    //
-                    //";
-
-
-
-                    //cmd.CommandText = "drop table Book";
-                    cmd.CommandText = "select * from Book";
-                    cmd.CommandType = CommandType.Text;
-
-                    //int i = cmd.ExecuteNonQuery();
-
-                    SQLiteDataAdapter da = new SQLiteDataAdapter(cmd);
-                    DataSet ds = new DataSet();
-
-                    da.Fill(ds);
-
-                }
-            }
-
-
-
-
-
-        }
 
         public static DataSet ExecuteQuery(string cmdText, params object[] p)
         {
@@ -199,18 +163,7 @@ deletion varchar(255)
             }
         }
 
-        //public static int ExecuteNonQuery(string cmdText, params object[] p)
-        //{
-        //    using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
-        //    {
-        //        using (SQLiteCommand command = new SQLiteCommand())
-        //        {
-        //            PrepareCommand(command, conn, cmdText, p);
-        //            return command.ExecuteNonQuery();
-        //        }
-        //    }
-        //}
-
+       
         public static SQLiteDataReader ExecuteReader(string cmdText, params object[] p)
         {
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))

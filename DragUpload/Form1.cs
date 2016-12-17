@@ -27,6 +27,7 @@ namespace DragUpload
 
             SQLiteHelper.ConnectionString = ConfigurationManager.AppSettings["sqlite"];
             SQLiteHelper.CreateTable();
+
         }
 
 
@@ -36,7 +37,7 @@ namespace DragUpload
         void imgurDelete(string hash)
         {
             var client = new RestClient("https://api.imgur.com/3/image/" + hash);
-            var request = new RestRequest(Method.POST);
+            var request = new RestRequest(Method.DELETE);
             request.AddHeader("Authorization", imgurConfig.Authorization);
             var response = client.Execute(request);
         }
@@ -67,9 +68,27 @@ namespace DragUpload
             record.name = smms.data.id;
             record.url = smms.data.link;
             record.deleteUrl = smms.data.deletehash;
+            record.type = ImgType.IMGUR;
             SQLiteHelper.Add(record);
         }
 
+
+        private void smmsDelete(string url)
+        {
+            try
+            {
+                var client = new RestClient(url);
+
+                var request = new RestRequest(Method.GET);
+
+                var response = client.Execute(request);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
 
         private void smmsupload()
         {
@@ -94,7 +113,7 @@ namespace DragUpload
                 record.name = smms.data.filename;
                 record.url = smms.data.url;
                 record.deleteUrl = smms.data.delete;
-
+                record.type = ImgType.SMMS;
 
                 SQLiteHelper.Add(record);
 
@@ -218,8 +237,21 @@ namespace DragUpload
                     {
                         DataGridViewCellCollection cells = row.Cells;
                         var id = Convert.ToInt32(cells["id"].Value);
-                        SQLiteHelper.Remove(id);
-                        this.dataGridViewImg.Rows.Remove(row);
+                        var type = Convert.ToInt32(cells["type"].Value);
+                        var deletion = cells["deletion"].Value.ToString();
+                        if ((int)ImgType.SMMS == type)
+                        {
+                            smmsDelete(deletion);
+                            SQLiteHelper.Remove(id);
+                            this.dataGridViewImg.Rows.Remove(row);
+                        }
+                        else
+                        {
+                            //IMGUR
+                            imgurDelete(cells["deletion"].Value.ToString());
+                            SQLiteHelper.Remove(id);
+                            this.dataGridViewImg.Rows.Remove(row);
+                        } 
                     }
                 }
             }
