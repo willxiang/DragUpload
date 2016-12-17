@@ -58,11 +58,8 @@ namespace DragUpload
                 return;
             }
 
-
-            txtDel.Text = smms.data.deletehash;
-            txtUrl.Text = smms.data.link;
             txtMD.Text = String.Format("![{0}]({1})", smms.data.id, smms.data.link);
-
+            txtUrl.Text = smms.data.link;
 
             ImgRecord record = new ImgRecord();
             record.name = smms.data.id;
@@ -70,6 +67,8 @@ namespace DragUpload
             record.deleteUrl = smms.data.deletehash;
             record.type = ImgType.IMGUR;
             SQLiteHelper.Add(record);
+
+            getData();
         }
 
 
@@ -104,7 +103,6 @@ namespace DragUpload
 
                 var smms = JsonConvert.DeserializeObject<SMMS>(response.Content);
 
-                txtDel.Text = smms.data.delete;
                 txtUrl.Text = smms.data.url;
                 txtMD.Text = String.Format("![{0}]({1})", smms.data.filename, smms.data.url);
 
@@ -116,6 +114,8 @@ namespace DragUpload
                 record.type = ImgType.SMMS;
 
                 SQLiteHelper.Add(record);
+
+                getData();
 
             }
             catch (Exception ex)
@@ -187,15 +187,6 @@ namespace DragUpload
             txtMD.SelectAll();
         }
 
-        private void txtDel_Click(object sender, EventArgs e)
-        {
-            txtDel.SelectAll();
-        }
-
-        private void lbldel_Click(object sender, EventArgs e)
-        {
-            imgurDelete(this.txtDel.Text);
-        }
 
         private void btnExpand_Click(object sender, EventArgs e)
         {
@@ -251,24 +242,12 @@ namespace DragUpload
                             imgurDelete(cells["deletion"].Value.ToString());
                             SQLiteHelper.Remove(id);
                             this.dataGridViewImg.Rows.Remove(row);
-                        } 
+                        }
                     }
                 }
             }
         }
 
-        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in this.dataGridViewImg.SelectedRows)
-            {
-                if (!row.IsNewRow)
-                {
-                    DataGridViewCellCollection cells = row.Cells;
-                    var url = cells["url"].Value.ToString();
-                    System.Windows.Forms.Clipboard.SetText(url);
-                }
-            }
-        }
 
         private void dataGridViewImg_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -287,6 +266,45 @@ namespace DragUpload
             foreach (DataGridViewRow row in this.dataGridViewImg.Rows)
             {
                 row.Selected = false;
+            }
+        }
+
+        private void dataGridViewImg_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var index = this.dataGridViewImg.CurrentCell.RowIndex;
+
+            var name = this.dataGridViewImg["name",index].Value.ToString();
+            var url = this.dataGridViewImg["url", index].Value.ToString();
+
+            txtMD.Text = String.Format("![{0}]({1})", name, url);
+            txtUrl.Text = url;
+
+        }
+
+        private void uRLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in this.dataGridViewImg.SelectedRows)
+            {
+                if (!row.IsNewRow)
+                {
+                    DataGridViewCellCollection cells = row.Cells;
+                    var url = cells["url"].Value.ToString();
+                    System.Windows.Forms.Clipboard.SetText(url);
+                }
+            }
+        }
+
+        private void markDownToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in this.dataGridViewImg.SelectedRows)
+            {
+                if (!row.IsNewRow)
+                {
+                    DataGridViewCellCollection cells = row.Cells;
+                    var url = cells["url"].Value.ToString();
+                    var name = cells["name"].Value.ToString();
+                    System.Windows.Forms.Clipboard.SetText(String.Format("![{0}]({1})", name, url));
+                }
             }
         }
 

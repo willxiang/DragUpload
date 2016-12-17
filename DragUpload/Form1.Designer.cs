@@ -34,8 +34,6 @@
             this.lblUrl = new System.Windows.Forms.Label();
             this.txtMD = new System.Windows.Forms.TextBox();
             this.lblmd = new System.Windows.Forms.Label();
-            this.txtDel = new System.Windows.Forms.TextBox();
-            this.lbldel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnExpand = new System.Windows.Forms.Button();
             this.dataGridViewImg = new System.Windows.Forms.DataGridView();
@@ -44,6 +42,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uRLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.markDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewImg)).BeginInit();
@@ -70,7 +70,7 @@
             // 
             // txtMD
             // 
-            this.txtMD.Location = new System.Drawing.Point(41, 145);
+            this.txtMD.Location = new System.Drawing.Point(41, 202);
             this.txtMD.Name = "txtMD";
             this.txtMD.ReadOnly = true;
             this.txtMD.Size = new System.Drawing.Size(309, 21);
@@ -80,30 +80,11 @@
             // lblmd
             // 
             this.lblmd.AutoSize = true;
-            this.lblmd.Location = new System.Drawing.Point(39, 121);
+            this.lblmd.Location = new System.Drawing.Point(39, 178);
             this.lblmd.Name = "lblmd";
             this.lblmd.Size = new System.Drawing.Size(65, 12);
             this.lblmd.TabIndex = 1;
             this.lblmd.Text = "markdown：";
-            // 
-            // txtDel
-            // 
-            this.txtDel.Location = new System.Drawing.Point(41, 212);
-            this.txtDel.Name = "txtDel";
-            this.txtDel.ReadOnly = true;
-            this.txtDel.Size = new System.Drawing.Size(309, 21);
-            this.txtDel.TabIndex = 0;
-            this.txtDel.Click += new System.EventHandler(this.txtDel_Click);
-            // 
-            // lbldel
-            // 
-            this.lbldel.AutoSize = true;
-            this.lbldel.Location = new System.Drawing.Point(39, 188);
-            this.lbldel.Name = "lbldel";
-            this.lbldel.Size = new System.Drawing.Size(65, 12);
-            this.lbldel.TabIndex = 1;
-            this.lbldel.Text = "删除地址：";
-            this.lbldel.Click += new System.EventHandler(this.lbldel_Click);
             // 
             // panel1
             // 
@@ -113,15 +94,13 @@
             this.panel1.Controls.Add(this.radioBtn_SMMS);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.lblUrl);
-            this.panel1.Controls.Add(this.lbldel);
             this.panel1.Controls.Add(this.txtUrl);
             this.panel1.Controls.Add(this.lblmd);
             this.panel1.Controls.Add(this.txtMD);
-            this.panel1.Controls.Add(this.txtDel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(379, 260);
+            this.panel1.Size = new System.Drawing.Size(984, 260);
             this.panel1.TabIndex = 2;
             // 
             // btnExpand
@@ -148,6 +127,7 @@
             this.dataGridViewImg.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewImg.Size = new System.Drawing.Size(587, 221);
             this.dataGridViewImg.TabIndex = 3;
+            this.dataGridViewImg.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewImg_CellClick);
             this.dataGridViewImg.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewImg_CellMouseUp);
             // 
             // radioBtn_Imgur
@@ -187,19 +167,35 @@
             this.copyToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(114, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 70);
             // 
             // copyToolStripMenuItem
             // 
+            this.copyToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.uRLToolStripMenuItem,
+            this.markDownToolStripMenuItem});
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.copyToolStripMenuItem.Text = "Copy";
-            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // uRLToolStripMenuItem
+            // 
+            this.uRLToolStripMenuItem.Name = "uRLToolStripMenuItem";
+            this.uRLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.uRLToolStripMenuItem.Text = "URL";
+            this.uRLToolStripMenuItem.Click += new System.EventHandler(this.uRLToolStripMenuItem_Click);
+            // 
+            // markDownToolStripMenuItem
+            // 
+            this.markDownToolStripMenuItem.Name = "markDownToolStripMenuItem";
+            this.markDownToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.markDownToolStripMenuItem.Text = "MarkDown";
+            this.markDownToolStripMenuItem.Click += new System.EventHandler(this.markDownToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -208,7 +204,7 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(379, 260);
+            this.ClientSize = new System.Drawing.Size(984, 260);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -231,8 +227,6 @@
         private System.Windows.Forms.Label lblUrl;
         private System.Windows.Forms.TextBox txtMD;
         private System.Windows.Forms.Label lblmd;
-        private System.Windows.Forms.TextBox txtDel;
-        private System.Windows.Forms.Label lbldel;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RadioButton radioBtn_Imgur;
         private System.Windows.Forms.RadioButton radioBtn_SMMS;
@@ -242,6 +236,8 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uRLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem markDownToolStripMenuItem;
     }
 }
 
