@@ -11,6 +11,7 @@ using System.IO;
 using Newtonsoft.Json;
 using DragUpload.Model;
 using System.Configuration;
+using System.Threading;
 
 namespace DragUpload
 {
@@ -28,7 +29,11 @@ namespace DragUpload
             SQLiteHelper.ConnectionString = ConfigurationManager.AppSettings["sqlite"];
             SQLiteHelper.CreateTable();
 
+
+            getImage("https://ooo.0o0.ooo/2016/12/20/5858addf1044a.jpg");
         }
+
+
 
 
         Picture activePicture = null;
@@ -43,34 +48,112 @@ namespace DragUpload
         }
 
 
-        void imgurUpload()
+        void getImage(string url)
         {
-            var client = new RestClient("https://api.imgur.com/3/upload");
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("Authorization", imgurConfig.Authorization);
-            request.AddFile("image", activePicture.Path);
-            var response = client.Execute(request);
-            var smms = JsonConvert.DeserializeObject<Imgur>(response.Content);
+            var client = new RestClient(url);
 
-            if (smms == null)
+            var request = new RestRequest();
+
+            var obj = client.Execute(request);
+
+
+
+            Bitmap bmp;
+            using (var ms = new MemoryStream(obj.RawBytes))
             {
-                MessageBox.Show("服务器连接失败");
-                return;
+                bmp = new Bitmap(ms);
             }
-
-            txtMD.Text = String.Format("![{0}]({1})", smms.data.id, smms.data.link);
-            txtUrl.Text = smms.data.link;
-
-            ImgRecord record = new ImgRecord();
-            record.name = smms.data.id;
-            record.url = smms.data.link;
-            record.deleteUrl = smms.data.deletehash;
-            record.type = ImgType.IMGUR;
-            SQLiteHelper.Add(record);
-
-            getData();
         }
 
+
+        void imgurUpload()
+        {
+            if (InvokeRequired && IsHandleCreated)
+            {
+                Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        var client = new RestClient("https://api.imgur.com/3/upload");
+                        var request = new RestRequest(Method.POST);
+                        request.AddHeader("Authorization", imgurConfig.Authorization);
+                        request.AddFile("image", activePicture.Path);
+                        var response = client.Execute(request);
+                        var smms = JsonConvert.DeserializeObject<Imgur>(response.Content);
+
+                        if (smms == null)
+                        {
+                            MessageBox.Show("服务器连接失败");
+                            return;
+                        }
+
+                        txtMD.Text = String.Format("![{0}]({1})", smms.data.id, smms.data.link);
+                        txtUrl.Text = smms.data.link;
+
+                        ImgRecord record = new ImgRecord();
+                        record.name = smms.data.id;
+                        record.url = smms.data.link;
+                        record.deleteUrl = smms.data.deletehash;
+                        record.type = ImgType.IMGUR;
+                        SQLiteHelper.Add(record);
+
+                        getData();
+
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.ToString());
+                    }
+
+                }));
+            }
+
+
+
+        }
+
+
+
+
+        private void smmsupload()
+        {
+            if (InvokeRequired && IsHandleCreated)
+            {
+                Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        var client = new RestClient("https://sm.ms/api/upload");
+
+                        var request = new RestRequest(Method.POST);
+
+                        request.AddFile("smfile", activePicture.Path);
+
+                        var response = client.Execute(request);
+
+                        var smms = JsonConvert.DeserializeObject<SMMS>(response.Content);
+
+                        txtUrl.Text = smms.data.url;
+                        txtMD.Text = String.Format("![{0}]({1})", smms.data.filename, smms.data.url);
+
+
+                        ImgRecord record = new ImgRecord();
+                        record.name = smms.data.filename;
+                        record.url = smms.data.url;
+                        record.deleteUrl = smms.data.delete;
+                        record.type = ImgType.SMMS;
+
+                        SQLiteHelper.Add(record);
+
+                        getData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+                }));
+            }
+        }
 
         private void smmsDelete(string url)
         {
@@ -81,41 +164,6 @@ namespace DragUpload
                 var request = new RestRequest(Method.GET);
 
                 var response = client.Execute(request);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void smmsupload()
-        {
-            try
-            {
-                var client = new RestClient("https://sm.ms/api/upload");
-
-                var request = new RestRequest(Method.POST);
-
-                request.AddFile("smfile", activePicture.Path);
-
-                var response = client.Execute(request);
-
-                var smms = JsonConvert.DeserializeObject<SMMS>(response.Content);
-
-                txtUrl.Text = smms.data.url;
-                txtMD.Text = String.Format("![{0}]({1})", smms.data.filename, smms.data.url);
-
-
-                ImgRecord record = new ImgRecord();
-                record.name = smms.data.filename;
-                record.url = smms.data.url;
-                record.deleteUrl = smms.data.delete;
-                record.type = ImgType.SMMS;
-
-                SQLiteHelper.Add(record);
-
-                getData();
 
             }
             catch (Exception ex)
@@ -143,18 +191,24 @@ namespace DragUpload
 
             if (s.Length > 0)
             {
-                ReadPicture(s[0].ToString());
-                if (radioBtn_SMMS.Checked)
-                    smmsupload();
-                else
-                    imgurUpload();
+                var thread = new Thread((img) =>
+                {
+                    string[] item = img as string[];
+                    ReadPicture(s[0].ToString());
+                    if (radioBtn_SMMS.Checked)
+                    {
+                        smmsupload();
+                    }
+                    else
+                    {
+                        imgurUpload();
+                    }
+                }) { IsBackground = true };
+
+                thread.Start(s);
             }
 
         }
-
-
-
-
 
 
 
@@ -273,12 +327,22 @@ namespace DragUpload
         {
             var index = this.dataGridViewImg.CurrentCell.RowIndex;
 
-            var name = this.dataGridViewImg["name",index].Value.ToString();
+            var name = this.dataGridViewImg["name", index].Value.ToString();
             var url = this.dataGridViewImg["url", index].Value.ToString();
 
             txtMD.Text = String.Format("![{0}]({1})", name, url);
             txtUrl.Text = url;
 
+        }
+
+
+        private void dataGridViewImg_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var index = this.dataGridViewImg.CurrentCell.RowIndex;
+
+            var url = this.dataGridViewImg["url", index].Value.ToString();
+
+            System.Diagnostics.Process.Start(url);
         }
 
         private void uRLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -307,6 +371,8 @@ namespace DragUpload
                 }
             }
         }
+
+
 
 
 

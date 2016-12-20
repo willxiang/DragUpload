@@ -45,9 +45,11 @@
             this.uRLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.markDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewImg)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // txtUrl
@@ -70,7 +72,7 @@
             // 
             // txtMD
             // 
-            this.txtMD.Location = new System.Drawing.Point(41, 202);
+            this.txtMD.Location = new System.Drawing.Point(41, 163);
             this.txtMD.Name = "txtMD";
             this.txtMD.ReadOnly = true;
             this.txtMD.Size = new System.Drawing.Size(309, 21);
@@ -80,7 +82,7 @@
             // lblmd
             // 
             this.lblmd.AutoSize = true;
-            this.lblmd.Location = new System.Drawing.Point(39, 178);
+            this.lblmd.Location = new System.Drawing.Point(39, 139);
             this.lblmd.Name = "lblmd";
             this.lblmd.Size = new System.Drawing.Size(65, 12);
             this.lblmd.TabIndex = 1;
@@ -88,6 +90,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.btnExpand);
             this.panel1.Controls.Add(this.dataGridViewImg);
             this.panel1.Controls.Add(this.radioBtn_Imgur);
@@ -128,6 +131,7 @@
             this.dataGridViewImg.Size = new System.Drawing.Size(587, 221);
             this.dataGridViewImg.TabIndex = 3;
             this.dataGridViewImg.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewImg_CellClick);
+            this.dataGridViewImg.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewImg_CellDoubleClick);
             this.dataGridViewImg.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewImg_CellMouseUp);
             // 
             // radioBtn_Imgur
@@ -181,14 +185,14 @@
             // uRLToolStripMenuItem
             // 
             this.uRLToolStripMenuItem.Name = "uRLToolStripMenuItem";
-            this.uRLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.uRLToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.uRLToolStripMenuItem.Text = "URL";
             this.uRLToolStripMenuItem.Click += new System.EventHandler(this.uRLToolStripMenuItem_Click);
             // 
             // markDownToolStripMenuItem
             // 
             this.markDownToolStripMenuItem.Name = "markDownToolStripMenuItem";
-            this.markDownToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.markDownToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.markDownToolStripMenuItem.Text = "MarkDown";
             this.markDownToolStripMenuItem.Click += new System.EventHandler(this.markDownToolStripMenuItem_Click);
             // 
@@ -198,6 +202,14 @@
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(41, 198);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 50);
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
             // 
             // Form1
             // 
@@ -217,6 +229,7 @@
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewImg)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -238,6 +251,7 @@
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uRLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem markDownToolStripMenuItem;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
